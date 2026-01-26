@@ -1,0 +1,28 @@
+spring:
+  config:
+    import: optional:file:.env[.properties]
+  application:
+    name: worker
+
+  # AWS 연결 설정
+  cloud:
+    aws:
+      credentials:
+        access-key: ${AWS_ACCESS_KEY_ID}
+        secret-key: ${AWS_SECRET_ACCESS_KEY}
+      region:
+        static: ap-northeast-2  # 서울 리전 (고정)
+
+      # SQS 리스너 설정 (성능 최적화)
+      sqs:
+        listener:
+          wait-timeout: 20s        # Long Polling (빈손으로 오지 말고 20초 기다렸다 와라)
+          max-concurrent-messages: 10 # 한 번에 10개씩 처리 (너무 많으면 터짐)
+
+# 커스텀 설정 (우리가 코드에서 갖다 쓸 변수들)
+custom:
+  sqs:
+    queue-name: ${SQS_QUEUE_NAME}
+  api:
+    backend-url: ${SPRING_BASE_URL}     # 본사 서버 주소
+    token: ${INTERNAL_API_TOKEN}        # 보안 토큰

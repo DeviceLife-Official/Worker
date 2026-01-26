@@ -1,0 +1,41 @@
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '3.5.10'
+	id 'io.spring.dependency-management' version '1.1.7'
+}
+
+group = 'com.devicelife'
+version = '0.0.1-SNAPSHOT'
+description = 'Evaluation Worker Service'
+
+java {
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(17)
+	}
+}
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	compileOnly 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    // AWS SQS (Spring Cloud AWS 3.x)
+    implementation platform('io.awspring.cloud:spring-cloud-aws-dependencies:3.2.0')
+    implementation 'io.awspring.cloud:spring-cloud-aws-starter-sqs'
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
