@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  worker:
+    build: .
+    container_name: worker-app
+
+    # 실패하면 무조건 재시작 (서버 재부팅 시 자동실행)
+    restart: always
+
+    # VM의 네트워크를 그대로 사용 (Tailscale IP 접속을 위해 필수 ⭐)
+    network_mode: host
+
+    env_file:
+      - .env
