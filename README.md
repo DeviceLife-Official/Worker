@@ -45,11 +45,12 @@
 
 ```
 src/main/java
-├── client      # Backend 서버와 통신하는 RestClient (Payload 요청, Result 전송)
-├── config      # 설정 파일 (Security, RestClient, SQS 설정)
-├── consumer    # SQS 메시지를 수신하는 리스너 (Main Entry Point)
-├── dto         # 데이터 전송 객체 (Message, Payload, Result)
-└── service     # 핵심 비즈니스 로직 (평가 알고리즘 구현체)
+└─ com.devicelife.devicelife_worker
+    ├── client      # Backend 서버와 통신하는 RestClient (Payload 요청, Result 전송)
+    ├── config      # 설정 파일 (Security, RestClient, SQS 설정)
+    ├── consumer    # SQS 메시지를 수신하는 리스너 (Main Entry Point)
+    ├── dto         # 데이터 전송 객체 (Message, Payload, Result)
+    └── service     # 핵심 비즈니스 로직 (평가 알고리즘 구현체)
 
 ```
 

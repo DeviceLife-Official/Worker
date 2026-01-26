@@ -1,4 +1,4 @@
-package client;
+package com.devicelife.devicelife_worker.client;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;

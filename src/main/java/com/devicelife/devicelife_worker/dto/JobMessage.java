@@ -1,4 +1,4 @@
-package dto;
+package com.devicelife.devicelife_worker.dto;
 public record JobMessage(
         Long evaluationId, // 평가 ID
         Long deviceId,     // 어떤 기기인지

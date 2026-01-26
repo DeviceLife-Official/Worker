@@ -1,7 +1,7 @@
-package client;
+package com.devicelife.devicelife_worker.client;
 
-import dto.EvaluationPayload;
-import dto.EvaluationResult;
+import com.devicelife.devicelife_worker.dto.EvaluationPayload;
+import com.devicelife.devicelife_worker.dto.EvaluationResult;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;

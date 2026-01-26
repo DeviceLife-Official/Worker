@@ -1,4 +1,4 @@
-package dto;
+package com.devicelife.devicelife_worker.dto;
 
 import java.util.Map;
 
