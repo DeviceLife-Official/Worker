@@ -12,36 +12,39 @@ public class EvaluationService {
     private final CompatibilityEvaluator compatibilityEvaluator;
 
     public EvaluationResult evaluate(EvaluationPayload payload) {
-        // --- 1. 연동성 평가 (구현 완료) ---
+        // --- 1. 연동성 평가 (payload 내부의 devices 리스트를 사용하도록 Evaluator 수정 필요) ---
         int compScore = compatibilityEvaluator.calculate(payload);
         String compGrade = getGrade(compScore);
 
-        // --- 2. 편의성 평가 (아직 로직 없음 -> 0점 처리) ---
-        // int convScore = convenienceEvaluator.calculate(payload); // 나중에 구현
+        // --- 2. 편의성 평가 (0점 처리) ---
         int convScore = 0;
         String convGrade = getGrade(convScore);
 
-        // --- 3. 라이프스타일 평가 (아직 로직 없음 -> 0점 처리) ---
-        // int lifeScore = lifestyleEvaluator.calculate(payload); // 나중에 구현
+        // --- 3. 라이프스타일 평가 (0점 처리) ---
         int lifeScore = 0;
         String lifeGrade = getGrade(lifeScore);
 
-        // 최종 성적표 발송 (3개 분야)
+        int totalScore = compScore + convScore + lifeScore;
+
+        // 최종 성적표 발송 (ID와 버전을 payload에서 정확히 추출)
         return new EvaluationResult(
-                payload.evaluationId(),
-                compScore, compGrade,
-                convScore, convGrade,
-                lifeScore, lifeGrade
+                payload.combinationId(),
+                payload.evaluationVersion(),
+                totalScore,
+                compScore,
+                convScore,
+                lifeScore,
+                compGrade,
+                convGrade,
+                lifeGrade
         );
     }
 
-    // ⭐ 만능 등급 판독기 (모든 분야 공통 사용)
     private String getGrade(int score) {
         if (score >= 90) return "최상";
         if (score >= 80) return "상";
-        if (score >= 60) return "중"; // 65점(기본점수)은 여기에 포함
+        if (score >= 60) return "중";
         if (score >= 40) return "하";
-        return "최하"; // 0점은 여기에 포함
+        return "최하";
     }
 }
-

@@ -1,18 +1,13 @@
 package com.devicelife.devicelife_worker.dto;
+
 public record EvaluationResult(
-        Long evaluationId,
-
-        // 1. 연동성 (Compatibility)
-        int compatibilityScore,
+        Long combinationId,      // [수정] evaluationId -> combinationId
+        Long evaluationVersion,  // [추가] 버전 정보 필수 포함
+        Integer totalScore,      // [추가] 백엔드 DTO와 이름 맞춤
+        Integer compatibilityScore,
+        Integer convenienceScore,
+        Integer lifestyleScore,
         String compatibilityGrade,
-
-        // 2. 편의성 (Convenience)
-        int convenienceScore,
         String convenienceGrade,
-
-        // 3. 라이프스타일 (Lifestyle)
-        int lifestyleScore,
         String lifestyleGrade
-      )
-    {}
-
+) {}

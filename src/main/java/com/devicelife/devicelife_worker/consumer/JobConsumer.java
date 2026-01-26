@@ -18,27 +18,25 @@ public class JobConsumer {
 
     private final BackendClient backendClient;
     private final EvaluationService evaluationService;
-
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    // ✅ SQS 리스너
     @SqsListener("${custom.sqs.queue-name}")
     public void listen(String messageBody) {
         log.info("🚀 SQS raw 메시지 수신: {}", messageBody);
 
         try {
-            // 0) JSON -> JobMessage (JavaType 헤더 무시)
             JobMessage message = objectMapper.readValue(messageBody, JobMessage.class);
             log.info("✅ JobMessage 변환 성공: {}", message);
 
             // 1. Payload 요청
             EvaluationPayload payload = backendClient.getPayload(message.evaluationId());
-            log.info("✅ Payload 획득 완료: ID={}", payload.evaluationId());
+            // 필드명을 evaluationId에서 combinationId로 변경
+            log.info("✅ Payload 획득 완료: ComboID={}, Version={}",
+                    payload.combinationId(), payload.evaluationVersion());
 
             // 2. 평가 로직 실행
             EvaluationResult result = evaluationService.evaluate(payload);
 
-            //  각 분야별 점수/등급 로그 출력
             log.info("✅ 평가 완료: 연동성={} ({}), 편의성={} ({}), 라이프스타일={} ({})",
                     result.compatibilityScore(), result.compatibilityGrade(),
                     result.convenienceScore(), result.convenienceGrade(),
@@ -49,7 +47,7 @@ public class JobConsumer {
             log.info("✅ 결과 전송 완료. 작업 끝!");
 
         } catch (Exception e) {
-            log.error("❌ 작업 처리 중 에러 발생 (DLQ로 이동됨) raw={}",messageBody, e);
+            log.error("❌ 작업 처리 중 에러 발생 (DLQ로 이동됨) raw={}", messageBody, e);
             throw new RuntimeException(e);
         }
     }
