@@ -9,7 +9,8 @@ public record EvaluationPayload(
         Long combinationId,      // 백엔드의 필드명과 일치시켜야 함
         Long evaluationVersion,
         String jobId,
-        List<DeviceDto> devices
+        List<DeviceDto> devices,
+        List<String> lifestyles
 ) {
     public record DeviceDto(
             Long deviceId,

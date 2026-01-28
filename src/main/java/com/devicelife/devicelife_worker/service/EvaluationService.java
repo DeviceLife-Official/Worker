@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 public class EvaluationService {
 
     private final CompatibilityEvaluator compatibilityEvaluator;
+    private final ConvenienceEvaluator convenienceEvaluator;
+    private final LifestyleEvaluator lifestyleEvaluator;
 
     public EvaluationResult evaluate(EvaluationPayload payload) {
         // --- 1. 연동성 평가 (payload 내부의 devices 리스트를 사용하도록 Evaluator 수정 필요) ---
@@ -17,11 +19,11 @@ public class EvaluationService {
         String compGrade = getGrade(compScore);
 
         // --- 2. 편의성 평가 (0점 처리) ---
-        int convScore = 0;
+        int convScore = convenienceEvaluator.calculate(payload);
         String convGrade = getGrade(convScore);
 
         // --- 3. 라이프스타일 평가 (0점 처리) ---
-        int lifeScore = 0;
+        int lifeScore = lifestyleEvaluator.calculate(payload);
         String lifeGrade = getGrade(lifeScore);
 
         int totalScore = compScore + convScore + lifeScore;
