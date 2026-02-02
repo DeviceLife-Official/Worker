@@ -10,8 +10,8 @@ import java.util.stream.Collectors;
 public class CompatibilityEvaluator {
 
     // 점수 계산 상수
-    private static final double WEIGHT_HUB = 0.6;
-    private static final double WEIGHT_QUALITY = 0.3;
+    private static final double WEIGHT_HUB = 0.45;
+    private static final double WEIGHT_QUALITY = 0.45;
     private static final double WEIGHT_ISOLATED = 0.1;
 
     public int calculate(EvaluationPayload payload) {
@@ -97,7 +97,7 @@ public class CompatibilityEvaluator {
                     if (hostOS != null && supportedLayouts.contains(hostOS)) {
                         score = 1.0;
                     } else {
-                        score = isLaptop ? 0.8 : 0.5;
+                        score = 0.4;
                     }
                     currentMax = Math.max(currentMax, score);
                     connectedDevices.add(host.deviceId());
@@ -130,32 +130,48 @@ public class CompatibilityEvaluator {
             }
         }
 
-        // (D) 오디오 ↔ 스마트폰
-        if (!phones.isEmpty()) {
+        // (D) 오디오 ↔ 재생 기기 (스마트폰, 노트북, 태블릿 통합)
+        List<EvaluationPayload.DeviceDto> audioSources = new ArrayList<>();
+        audioSources.addAll(phones);
+        audioSources.addAll(hosts); // hosts에는 이미 laptops, tablets가 들어있음
+
+        if (!audioSources.isEmpty()) {
             for (EvaluationPayload.DeviceDto audio : audios) {
                 Long aId = audio.deviceId();
                 targetedDevices.add(aId);
-                targetEdges++;
-                successEdges++;
-                connectedDevices.add(aId);
+                targetEdges++; // 이제 노트북이랑만 있어도 타겟이 잡히도록 수정
 
                 double currentMax = 0.0;
-                for (EvaluationPayload.DeviceDto phone : phones) {
-                    String phoneOS = (String) phone.specs().get("os");
+                boolean connected = false;
+
+                for (EvaluationPayload.DeviceDto source : audioSources) {
+                    String sourceOS = (String) source.specs().get("os"); // phoneOS -> sourceOS로 변경
 
                     Object codecObj = audio.specs().get("supportedCodecs");
                     List<String> audioCodecs = (codecObj instanceof List) ? (List<String>) codecObj : Collections.emptyList();
 
+                    // 연결성 체크 (오디오는 블루투스라 기본 연결은 된다고 가정하거나, 필요 시 로직 추가)
+                    connected = true;
+                    connectedDevices.add(source.deviceId());
+
                     boolean highQuality = false;
-                    if ("iOS".equalsIgnoreCase(phoneOS)) {
+                    // OS별 고음질 코덱 판별 로직
+                    if (sourceOS != null && (sourceOS.contains("iOS") || sourceOS.contains("iPadOS") || sourceOS.contains("macOS"))) {
+                        // 애플 계열: AAC 지원 여부 확인
                         if (audioCodecs.contains("AAC")) highQuality = true;
                     } else {
-                        if (audioCodecs.contains("LDAC") || audioCodecs.contains("aptX")) highQuality = true;
+                        // 그 외 (Android, Windows): LDAC, aptX 등 확인
+                        if (audioCodecs.contains("LDAC") || audioCodecs.contains("aptX") || audioCodecs.contains("SSC")) highQuality = true;
                     }
 
-                    double score = highQuality ? 1.0 : 0.6;
+                    // [패널티 적용] 0.7 (아까 정한 그 점수)
+                    double score = highQuality ? 1.0 : 0.7;
                     currentMax = Math.max(currentMax, score);
-                    connectedDevices.add(phone.deviceId());
+                }
+
+                if (connected) {
+                    successEdges++;
+                    connectedDevices.add(aId);
                 }
                 totalQuality += currentMax;
             }
